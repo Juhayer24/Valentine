@@ -1,159 +1,664 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Be My Valentine?</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Will You Be My Valentine?</title>
+  <style>
+    :root{
+      --bg1:#ff3b7a;
+      --bg2:#8a2be2;
+      --card:#ffffffcc;
+      --card2:#ffffffef;
+      --text:#1a1a1a;
+      --yes1:#19c37d;
+      --yes2:#0ea5e9;
+      --no1:#ff4d4d;
+      --no2:#ff9a3d;
+      --shadow: 0 18px 50px rgba(0,0,0,.22);
+    }
 
-<style>
-body {
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-    background: linear-gradient(135deg, #ff9ad5, #ff6ec7, #ffb6f9);
-    overflow: hidden;
-}
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color: var(--text); }
 
-.container {
-    text-align: center;
-    background: white;
-    padding: 40px;
-    border-radius: 25px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    position: relative;
-}
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      background:
+        radial-gradient(1200px 700px at 15% 20%, rgba(255,255,255,.28), transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,.18), transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
 
-h1 {
-    color: #ff1493;
-    font-size: 2.5rem;
-}
+    /* Floating hearts */
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.9;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.2));
+    }
+    .heart{
+      position:absolute;
+      width:18px; height:18px;
+      transform: rotate(45deg);
+      background: rgba(255,255,255,.9);
+      border-radius: 4px;
+      animation: floatUp linear infinite;
+    }
+    .heart::before, .heart::after{
+      content:"";
+      position:absolute;
+      width:18px; height:18px;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .heart::before{ left:-9px; top:0; }
+    .heart::after{ top:-9px; left:0; }
 
-.buttons {
-    margin-top: 30px;
-    position: relative;
-    height: 150px;
-}
+    @keyframes floatUp{
+      from{ transform: translateY(40px) rotate(45deg); opacity: 0; }
+      10%{ opacity: .95; }
+      to{ transform: translateY(-120vh) rotate(45deg); opacity: 0; }
+    }
 
-button {
-    padding: 15px 30px;
-    font-size: 18px;
-    border-radius: 30px;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
-}
+    /* Card */
+    .card{
+      width:min(780px, 92vw);
+      background: linear-gradient(180deg, var(--card2), var(--card));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3vw, 34px);
+      position: relative;
+      z-index: 5;
+    }
 
-#yesBtn {
-    background-color: #ff1493;
-    color: white;
-    box-shadow: 0 5px 15px rgba(255,20,147,0.4);
-}
+    .topRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
 
-#yesBtn:hover {
-    transform: scale(1.1);
-    background-color: #ff69b4;
-}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(255,255,255,.55);
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+    .badge .dot{
+      width:10px; height:10px;
+      border-radius:50%;
+      background: linear-gradient(135deg, #ff3b7a, #ffd1dc);
+      box-shadow: 0 0 0 6px rgba(255,59,122,.15);
+    }
 
-#noBtn {
-    background-color: #555;
-    color: white;
-    position: absolute;
-    left: 200px;
-    top: 0;
-}
+    h1{
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.05;
+      margin: 14px 0 8px;
+      letter-spacing: -.5px;
+    }
+    .sub{
+      font-size: clamp(15px, 1.4vw, 18px);
+      opacity:.85;
+      margin: 0 0 18px;
+    }
 
-.hearts {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
+    .contentGrid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: clamp(14px, 2.2vw, 22px);
+      align-items: stretch;
+    }
+    @media (max-width: 740px){
+      .contentGrid{ grid-template-columns: 1fr; }
+    }
 
-.heart {
-    position: absolute;
-    color: #ff1493;
-    animation: float 4s linear infinite;
-}
+    .panel{
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 12px 26px rgba(0,0,0,.08);
+      position: relative;
+      overflow:hidden;
+    }
+    .panel::after{
+      content:"";
+      position:absolute;
+      inset:-60px -60px auto auto;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,59,122,.35), transparent 60%);
+      transform: rotate(18deg);
+      pointer-events:none;
+    }
 
-@keyframes float {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(-500px); opacity: 0; }
-}
-</style>
+    .prompt{
+      font-size: clamp(20px, 2.2vw, 26px);
+      margin: 0 0 10px;
+      font-weight: 800;
+    }
+    .status{
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: 16px;
+      font-size: 14px;
+      opacity:.9;
+    }
+
+    /* Button area */
+    .arenaWrap{
+      position: relative;
+      min-height: 280px;
+    }
+    .arena{
+      position: relative;
+      height: 280px;
+      border-radius: 22px;
+      background:
+        radial-gradient(240px 160px at 20% 30%, rgba(255,59,122,.22), transparent 60%),
+        radial-gradient(240px 160px at 80% 60%, rgba(138,43,226,.18), transparent 60%),
+        rgba(255,255,255,.5);
+      border: 1px dashed rgba(0,0,0,.12);
+      overflow:hidden;
+    }
+
+    .buttons{
+      position:absolute;
+      inset: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 16px;
+      flex-wrap:wrap;
+      padding: 18px;
+    }
+
+    button{
+      border: 0;
+      cursor: pointer;
+      font-weight: 900;
+      letter-spacing: .2px;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font-size: 16px;
+      box-shadow: 0 14px 28px rgba(0,0,0,.15);
+      transform: translateZ(0);
+      transition: transform .12s ease, filter .12s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      max-width: 92%;
+    }
+    button:active{ transform: scale(.98); }
+    button:focus-visible{
+      outline: 3px solid rgba(0,0,0,.18);
+      outline-offset: 4px;
+    }
+
+    .yes{
+      background: linear-gradient(135deg, var(--yes1), var(--yes2));
+      color: white;
+    }
+    .yes:hover{ filter: brightness(1.03) saturate(1.08); }
+
+    /* The moving "No" button is positioned absolutely inside the arena */
+    .no{
+      position:absolute;
+      left: 62%;
+      top: 58%;
+      background: linear-gradient(135deg, var(--no1), var(--no2));
+      color: white;
+      white-space: nowrap;
+    }
+    .no:hover{ filter: brightness(1.02) saturate(1.1); }
+
+    .footer{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      opacity:.85;
+      font-size: 13px;
+    }
+
+    .tinyBtn{
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(0,0,0,.1);
+      box-shadow: 0 10px 20px rgba(0,0,0,.08);
+      padding: 10px 14px;
+      font-weight: 800;
+      border-radius: 999px;
+      cursor:pointer;
+    }
+    .tinyBtn:hover{ filter: brightness(1.02); }
+
+    /* Celebration modal-ish panel */
+    .celebrate{
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items:center;
+      justify-content:center;
+      z-index: 50;
+      background: rgba(0,0,0,.35);
+      padding: 20px;
+    }
+    .celebrate.show{ display:flex; }
+
+    .modal{
+      width:min(640px, 94vw);
+      background: linear-gradient(180deg, #fff, #ffffffcc);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.6);
+      box-shadow: 0 22px 70px rgba(0,0,0,.28);
+      padding: 22px 22px 18px;
+      position: relative;
+      overflow:hidden;
+    }
+    .modal h2{
+      margin: 6px 0 6px;
+      font-size: clamp(24px, 3.4vw, 36px);
+      letter-spacing: -.4px;
+    }
+    .modal p{
+      margin: 0 0 14px;
+      opacity:.9;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+    .closeRow{
+      display:flex;
+      gap: 10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    /* Confetti */
+    .confetti{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 60;
+      display:none;
+    }
+    .confetti.show{ display:block; }
+    .confetti span{
+      position:absolute;
+      width: 10px;
+      height: 16px;
+      border-radius: 3px;
+      opacity: .95;
+      animation: confettiFall linear forwards;
+      box-shadow: 0 6px 10px rgba(0,0,0,.18);
+    }
+    @keyframes confettiFall{
+      from{ transform: translateY(-12vh) rotate(0deg); }
+      to{ transform: translateY(112vh) rotate(740deg); }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="hearts" aria-hidden="true" id="hearts"></div>
 
-<div class="container">
-    <h1 id="question">Will you be my Valentine? 💘</h1>
-    <div class="buttons">
-        <button id="yesBtn">YES 💖</button>
-        <button id="noBtn">No 😒</button>
+  <main class="card" role="main">
+    <div class="topRow">
+      <div class="badge"><span class="dot"></span> Valentine Proposal Portal™</div>
+      <button class="tinyBtn" id="musicBtn" type="button">Toggle vibes</button>
     </div>
-</div>
 
-<div class="hearts" id="hearts"></div>
+    <h1>Will you be my Valentine? 💘</h1>
+    <p class="sub">One button is honest. The other is a professional escape artist with commitment issues.</p>
 
-<script>
-const noBtn = document.getElementById("noBtn");
-const yesBtn = document.getElementById("yesBtn");
-const question = document.getElementById("question");
-const heartsContainer = document.getElementById("hearts");
+    <div class="contentGrid">
+      <section class="panel">
+        <p class="prompt" id="promptLine">Choose wisely. History is watching.</p>
+        <div class="status" id="status">
+          Status: awaiting a brave decision.
+        </div>
 
-const noTexts = [
-    "Are you sure? 😢",
-    "Think again 😭",
-    "That's illegal 🚔",
-    "Error 404: No not found 🤖",
-    "Nice try 😂",
-    "You can't escape 💨",
-    "Just press YES 🙄",
-    "Why you like this 😩",
-    "Be serious 😤",
-    "Last chance 😈"
-];
+        <div class="footer">
+          <div>Tip: “No” is… experiencing technical difficulties.</div>
+          <button class="tinyBtn" id="resetBtn" type="button">Reset mischief</button>
+        </div>
+      </section>
 
-let attempt = 0;
+      <section class="panel arenaWrap">
+        <div class="arena" id="arena">
+          <div class="buttons">
+            <button class="yes" id="yesBtn" type="button">YES 💖</button>
+            <!-- "No" lives absolutely positioned so we can move it anywhere -->
+            <button class="no" id="noBtn" type="button" aria-label="No (good luck)">
+              no 😶
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
 
-noBtn.addEventListener("mouseover", () => {
-    attempt++;
-    
-    // Change text
-    noBtn.innerText = noTexts[attempt % noTexts.length];
-    
-    // Move button randomly
-    const x = Math.random() * 300 - 150;
-    const y = Math.random() * 150 - 75;
-    
-    noBtn.style.transform = `translate(${x}px, ${y}px)`;
-});
+  <div class="celebrate" id="celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrateTitle">
+    <div class="modal">
+      <div class="badge"><span class="dot"></span> Accepted ✅</div>
+      <h2 id="celebrateTitle">YESS!! 💞</h2>
+      <p id="celebrateText">
+        Congratulations. You just made the best decision since inventing snacks.
+        This page is now legally required to be cute.
+      </p>
+      <div class="closeRow">
+        <button class="tinyBtn" id="copyBtn" type="button">Copy victory message</button>
+        <button class="yes" id="closeBtn" type="button">Close 💘</button>
+      </div>
+    </div>
+  </div>
 
-yesBtn.addEventListener("click", () => {
-    question.innerText = "YAYYYY 💕 I knew you'd say YES!!! 😍💖";
-    yesBtn.style.display = "none";
-    noBtn.style.display = "none";
-    startHearts();
-});
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
 
-function startHearts() {
-    setInterval(() => {
-        const heart = document.createElement("div");
-        heart.classList.add("heart");
-        heart.innerText = "💖";
-        heart.style.left = Math.random() * window.innerWidth + "px";
-        heart.style.top = window.innerHeight + "px";
-        heart.style.fontSize = Math.random() * 30 + 20 + "px";
-        heartsContainer.appendChild(heart);
-        
-        setTimeout(() => {
-            heart.remove();
-        }, 4000);
-    }, 300);
-}
-</script>
+  <audio id="bgAudio" preload="auto" loop>
+    <!-- Tiny embedded beep-melody substitute (generated tone via JS if blocked). -->
+  </audio>
 
+  <script>
+    // --- Hearts background ---
+    const heartsEl = document.getElementById("hearts");
+    function spawnHearts(count = 22){
+      heartsEl.innerHTML = "";
+      for(let i=0;i<count;i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        const left = Math.random() * 100;
+        const delay = Math.random() * 6;
+        const duration = 6 + Math.random() * 7;
+        const size = 10 + Math.random() * 14;
+        h.style.left = left + "vw";
+        h.style.bottom = (-10 - Math.random()*30) + "vh";
+        h.style.animationDelay = delay + "s";
+        h.style.animationDuration = duration + "s";
+        h.style.width = size + "px";
+        h.style.height = size + "px";
+        h.style.opacity = (0.45 + Math.random()*0.5).toFixed(2);
+        heartsEl.appendChild(h);
+      }
+    }
+    spawnHearts();
+
+    // --- Main logic ---
+    const arena = document.getElementById("arena");
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const statusEl = document.getElementById("status");
+    const promptLine = document.getElementById("promptLine");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const celebrate = document.getElementById("celebrate");
+    const closeBtn = document.getElementById("closeBtn");
+    const copyBtn = document.getElementById("copyBtn");
+
+    const confetti = document.getElementById("confetti");
+
+    const musicBtn = document.getElementById("musicBtn");
+
+    const noPhrases = [
+      "nice try 😌",
+      "absolutely not (for you) 🏃‍♂️💨",
+      "denied 💅",
+      "oops, slippery 🙃",
+      "button said: no ❤️‍🩹",
+      "not today, villain 😭",
+      "error 403: feelings protected 🔒",
+      "run.exe engaged 🏃‍♀️",
+      "you missed me 😗",
+      "plot armor activated 🛡️",
+      "that’s my emotional support button 🥹",
+      "we don’t do that here 😌",
+      "try YES, it’s free 💖",
+      "haha nope ✨",
+      "ask again nicely 😇"
+    ];
+
+    const prompts = [
+      "Choose wisely. History is watching.",
+      "This is your moment. Don’t fumble it.",
+      "The Yes button is feeling lonely.",
+      "I have consulted the stars. They said: YES.",
+      "A wise person once said… click YES.",
+      "No button is on a cardio plan.",
+      "Be brave. Be romantic. Be efficient.",
+      "A puppy somewhere believes in you. Click YES."
+    ];
+
+    let dodgeCount = 0;
+    let lastMoveAt = 0;
+
+    function setStatus(msg){
+      statusEl.textContent = "Status: " + msg;
+    }
+
+    function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function moveNoButton(){
+      const now = performance.now();
+      // Throttle just a bit to avoid jitter storms on some devices
+      if(now - lastMoveAt < 35) return;
+      lastMoveAt = now;
+
+      const arenaRect = arena.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // Compute max top/left so the button stays fully inside arena
+      const maxLeft = arenaRect.width - btnRect.width;
+      const maxTop  = arenaRect.height - btnRect.height;
+
+      // Pick a random spot, but avoid putting it too close to center repeatedly
+      let left = Math.random() * maxLeft;
+      let top  = Math.random() * maxTop;
+
+      // Nudge away from the Yes button area near center-left
+      const cx = arenaRect.width * 0.50;
+      const cy = arenaRect.height * 0.50;
+      const dx = (left + btnRect.width/2) - cx;
+      const dy = (top + btnRect.height/2) - cy;
+      const dist = Math.hypot(dx, dy);
+
+      if(dist < 70){
+        left = clamp(left + (dx >= 0 ? 80 : -80), 0, maxLeft);
+        top  = clamp(top  + (dy >= 0 ? 70 : -70), 0, maxTop);
+      }
+
+      noBtn.style.left = left + "px";
+      noBtn.style.top  = top + "px";
+
+      // Make it funnier each time
+      dodgeCount++;
+      noBtn.textContent = pick(noPhrases);
+
+      // Update prompt/status with escalating humor
+      promptLine.textContent = pick(prompts);
+      if(dodgeCount === 1) setStatus("No attempted. The button fled.");
+      else if(dodgeCount === 2) setStatus("No attempted again. Button is now training for the Olympics.");
+      else if(dodgeCount === 4) setStatus("No button has entered its villain arc.");
+      else if(dodgeCount === 6) setStatus("Your persistence is impressive. Unfortunately, so is my programming.");
+      else setStatus(`No attempts: ${dodgeCount}. The button remains uncatchable.`);
+    }
+
+    // Dodge on hover (desktop) and on touchstart (mobile)
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("mouseover", moveNoButton);
+
+    // On mobile, "hover" isn't a thing, so dodge when they try to touch it
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+
+    // Extra: if cursor gets close, also dodge (makes it harder)
+    arena.addEventListener("mousemove", (e) => {
+      const a = arena.getBoundingClientRect();
+      const bx = parseFloat(noBtn.style.left || "0");
+      const by = parseFloat(noBtn.style.top || "0");
+      const br = noBtn.getBoundingClientRect();
+
+      const mx = e.clientX - a.left;
+      const my = e.clientY - a.top;
+
+      const cx = bx + br.width/2;
+      const cy = by + br.height/2;
+      const dist = Math.hypot(mx - cx, my - cy);
+
+      if(dist < 90) moveNoButton();
+    });
+
+    // --- Yes celebration ---
+    function launchConfetti(){
+      confetti.innerHTML = "";
+      confetti.classList.add("show");
+
+      const pieces = 120;
+      for(let i=0;i<pieces;i++){
+        const s = document.createElement("span");
+        const left = Math.random() * 100;
+        const delay = Math.random() * 0.6;
+        const duration = 2.6 + Math.random() * 1.8;
+        const sizeW = 7 + Math.random() * 8;
+        const sizeH = 10 + Math.random() * 14;
+
+        s.style.left = left + "vw";
+        s.style.top = (-10 - Math.random()*20) + "vh";
+        s.style.width = sizeW + "px";
+        s.style.height = sizeH + "px";
+        s.style.animationDelay = delay + "s";
+        s.style.animationDuration = duration + "s";
+
+        // Random bright-ish color
+        const hue = Math.floor(Math.random() * 360);
+        s.style.background = `hsl(${hue} 90% 62%)`;
+
+        confetti.appendChild(s);
+      }
+
+      // Auto-hide after it finishes
+      setTimeout(() => confetti.classList.remove("show"), 4200);
+    }
+
+    yesBtn.addEventListener("click", () => {
+      setStatus("YES clicked. Romance protocol initiated.");
+      celebrate.classList.add("show");
+      launchConfetti();
+      promptLine.textContent = "Correct. You have excellent taste. 💘";
+    });
+
+    closeBtn.addEventListener("click", () => {
+      celebrate.classList.remove("show");
+    });
+
+    celebrate.addEventListener("click", (e) => {
+      if(e.target === celebrate) celebrate.classList.remove("show");
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      const msg = "I said YES 💖🥰 Valentine status: secured.";
+      try{
+        await navigator.clipboard.writeText(msg);
+        copyBtn.textContent = "Copied ✅";
+        setTimeout(() => copyBtn.textContent = "Copy victory message", 1100);
+      }catch{
+        copyBtn.textContent = "Copy failed 😭";
+        setTimeout(() => copyBtn.textContent = "Copy victory message", 1100);
+      }
+    });
+
+    // Reset mischief
+    resetBtn.addEventListener("click", () => {
+      dodgeCount = 0;
+      noBtn.textContent = "no 😶";
+      noBtn.style.left = "62%";
+      noBtn.style.top = "58%";
+      promptLine.textContent = "Choose wisely. History is watching.";
+      setStatus("awaiting a brave decision.");
+      spawnHearts();
+    });
+
+    // --- Optional: tiny vibe sound using WebAudio (works even without audio file) ---
+    let audioCtx = null;
+    let vibeOn = false;
+    let vibeInterval = null;
+
+    function beep(freq, time=0.08, type="sine", gain=0.03){
+      if(!audioCtx) return;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.value = gain;
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime + time);
+    }
+
+    function startVibes(){
+      if(vibeOn) return;
+      vibeOn = true;
+      musicBtn.textContent = "Vibes: ON";
+      // A little “cute” arpeggio loop
+      const seq = [523.25, 659.25, 783.99, 659.25]; // C5 E5 G5 E5
+      let i = 0;
+      vibeInterval = setInterval(() => {
+        beep(seq[i % seq.length], 0.09, "triangle", 0.025);
+        i++;
+      }, 220);
+    }
+
+    function stopVibes(){
+      vibeOn = false;
+      musicBtn.textContent = "Toggle vibes";
+      if(vibeInterval) clearInterval(vibeInterval);
+      vibeInterval = null;
+    }
+
+    musicBtn.addEventListener("click", async () => {
+      try{
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(audioCtx.state === "suspended") await audioCtx.resume();
+      }catch{}
+      vibeOn ? stopVibes() : startVibes();
+    });
+
+    // Make sure "No" starts inside the arena correctly after layout
+    window.addEventListener("load", () => {
+      // If the initial percentage places it awkwardly on small screens, nudge it safely
+      moveNoButton();
+      // ...then set it once more so it's not immediately "running away" in front of them
+      setTimeout(() => {
+        dodgeCount = 0;
+        noBtn.textContent = "no 😶";
+      }, 120);
+    });
+
+    // Also keep it inside if the window resizes
+    window.addEventListener("resize", () => {
+      // Just relocate it safely
+      moveNoButton();
+    });
+  </script>
 </body>
 </html>
